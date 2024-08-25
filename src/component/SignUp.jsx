@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Input, Steps, Form, Progress } from 'antd';
+import { Button, Input, Steps, Form, Progress, message } from 'antd';
 import { LockOutlined, UserOutlined, MailOutlined, CheckCircleOutlined, CameraOutlined } from '@ant-design/icons';
 
 const { Step } = Steps;
@@ -8,11 +8,18 @@ const steps = [
   {
     title: 'Account',
     content: (
-      <Form layout="vertical">
+      <Form
+        layout="vertical"
+        name="accountForm"
+        initialValues={{ email: '', username: '', password: '', confirmPassword: '' }}
+      >
         <Form.Item
           label="Email:"
           name="email"
-          rules={[{ required: true, message: 'Please input your email!' }]}
+          rules={[
+            { required: true, message: 'Please input your email!' },
+            { type: 'email', message: 'Please enter a valid email!' },
+          ]}
         >
           <Input placeholder="Email Id" prefix={<MailOutlined />} />
         </Form.Item>
@@ -26,14 +33,28 @@ const steps = [
         <Form.Item
           label="Password:"
           name="password"
-          rules={[{ required: true, message: 'Please input your password!' }]}
+          rules={[
+            { required: true, message: 'Please input your password!' },
+            { min: 6, message: 'Password must be at least 6 characters long!' },
+          ]}
         >
           <Input.Password placeholder="Password" prefix={<LockOutlined />} />
         </Form.Item>
         <Form.Item
           label="Confirm Password:"
           name="confirmPassword"
-          rules={[{ required: true, message: 'Please confirm your password!' }]}
+          dependencies={['password']}
+          rules={[
+            { required: true, message: 'Please confirm your password!' },
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                if (!value || getFieldValue('password') === value) {
+                  return Promise.resolve();
+                }
+                return Promise.reject(new Error('The passwords do not match!'));
+              },
+            }),
+          ]}
         >
           <Input.Password placeholder="Confirm Password" prefix={<LockOutlined />} />
         </Form.Item>
@@ -60,9 +81,16 @@ const steps = [
 
 const SignUp = () => {
   const [current, setCurrent] = useState(0);
+  const [form] = Form.useForm();
 
-  const next = () => {
-    setCurrent(current + 1);
+  const next = async () => {
+    try {
+      // Validate the current step form
+      await form.validateFields();
+      setCurrent(current + 1);
+    } catch (errorInfo) {
+      message.error('Please correct the errors before proceeding.');
+    }
   };
 
   const prev = () => {
@@ -86,14 +114,14 @@ const SignUp = () => {
         style={{ marginBottom: '24px' }}
       />
 
-      <Steps current={current}>
+      <Steps current={current} className="custom-steps">
         {steps.map((item) => (
           <Step key={item.title} title={item.title} icon={item.icon} />
         ))}
       </Steps>
 
       <div className="steps-content" style={{ marginTop: '24px', padding: '16px', background: '#f5f5f5', borderRadius: '8px' }}>
-        {steps[current].content}
+        {React.cloneElement(steps[current].content, { form })}
       </div>
 
       <div className="steps-action" style={{ marginTop: '24px', textAlign: 'right' }}>
