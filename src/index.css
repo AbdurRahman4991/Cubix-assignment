@@ -1,0 +1,41 @@
+.signup-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-title h1 {
+  font-size: 24px;
+  text-align: center;
+  color: #5a2e87;
+}
+
+.form-title p {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #888;
+}
+
+.steps-content {
+  margin-top: 24px;
+  padding: 16px;
+  background: #f4f4f4;
+  border-radius: 4px;
+}
+
+.steps-action {
+  margin-top: 24px;
+  text-align: right;
+}
+
+.ant-steps-item-title {
+  font-weight: 600;
+}
+
+.ant-form-item-label > label {
+  color: #5a2e87;
+  font-weight: 500;
+}
